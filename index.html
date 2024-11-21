@@ -1,70 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Today's Whole Day Menu</title>
-  </head>
-  <body>
-    <h1>IIIT B  Menu</h1>
+</head>
+<body>
+    <h1>Today's Whole Day Menu</h1>
     <button onclick="getWholeDayMenu()">Get Today's Menu</button>
     <div id="menuDisplay"></div>
 
     <script>
-      // Function to get the current day as a string (e.g., "monday")
-      function getCurrentDay() {
-        const daysOfWeek = [
-          "sunday",
-          "monday",
-          "tuesday",
-          "wednesday",
-          "thursday",
-          "friday",
-          "saturday",
-        ];
-        const currentDate = new Date();
-        return daysOfWeek[currentDate.getDay()];
-      }
+        // Function to get the current day as a string (e.g., "monday")
+        function getCurrentDay() {
+            const daysOfWeek = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+            const currentDate = new Date();
+            return daysOfWeek[currentDate.getDay()];
+        }
 
-      // Function to fetch menu for a specific meal
-      async function fetchMenu(day, meal) {
-        try {
-          const response = await fetch(
-            "https://demo-vercel-yt-git-main-ands-projects-4fd20561.vercel.app/menu",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ message: `${day} ${meal}` }),
+        // Function to fetch menu for a specific meal
+        async function fetchMenu(day, meal) {
+            try {
+                const response = await fetch('https://demo-vercel-yt-git-main-ands-projects-4fd20561.vercel.app/menu', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: `${day} ${meal}` }),
+                });
+                const data = await response.json();
+                return data.response.replace(/\\u00a0/g, " "); // Clean up any special characters
+            } catch (error) {
+                return `Error fetching ${meal} menu: ${error.message}`;
             }
-          );
-          const data = await response.json();
-          // Replace \n with HTML line breaks for better readability
-          return data.response.replace(/\n/g, "<br>").replace(/\\u00a0/g, " ");
-        } catch (error) {
-          return `Error fetching ${meal} menu: ${error.message}`;
         }
-      }
 
-      // Function to get the full day's menu
-      async function getWholeDayMenu() {
-        const day = getCurrentDay();
-        const meals = ["breakfast", "lunch", "snacks", "dinner"];
-        const menuDisplay = document.getElementById("menuDisplay");
-        menuDisplay.innerHTML = "<p>Loading menu...</p>";
+        // Function to get the full day's menu
+        async function getWholeDayMenu() {
+            const day = getCurrentDay();
+            const meals = ["breakfast", "lunch", "snacks", "dinner"];
+            const menuDisplay = document.getElementById("menuDisplay");
+            menuDisplay.innerHTML = "<p>Loading menu...</p>";
 
-        let fullMenu = `<h2>Menu for ${
-          day.charAt(0).toUpperCase() + day.slice(1)
-        }</h2>`;
-        for (const meal of meals) {
-          const menu = await fetchMenu(day, meal);
-          fullMenu += `<h3>${
-            meal.charAt(0).toUpperCase() + meal.slice(1)
-          }:</h3><p>${menu}</p><hr>`;
+            let fullMenu = `<h2>Menu for ${day.charAt(0).toUpperCase() + day.slice(1)}</h2>`;
+            for (const meal of meals) {
+                const menu = await fetchMenu(day, meal);
+                fullMenu += `<h3>${meal.charAt(0).toUpperCase() + meal.slice(1)}:</h3><p>${menu}</p>`;
+            }
+            menuDisplay.innerHTML = fullMenu;
         }
-        menuDisplay.innerHTML = fullMenu;
-      }
     </script>
-  </body>
+</body>
 </html>
